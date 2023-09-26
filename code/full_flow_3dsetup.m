@@ -3,22 +3,22 @@
 % clear all;
 % close all;
 clc;
-addpath(genpath('/Applications/Psychtoolbox'))
-addpath('/Users/hopelutwak/Documents/MATLAB/VisTools/')
+% addpath(genpath('/Applications/Psychtoolbox'))
+% addpath('/Users/hopelutwak/Documents/MATLAB/VisTools/')
 % addpath('/Volvumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase1080p')
 
 %vvv
    %-----Subject Settings------------------
-    initials                        = 'HL';                                 % Subject initials used to save file
+    initials                        = 'hope';                                 % Subject initials used to save file
     session                         = 'test';
     feedback                        = 1;                                    % 1 = gives feedback after each trial (training), 0 = no feedback (actual experiment)
 
     %-----Rig Settings----------------------
-    mouseclick                      = 1;                                    % use mouseclick instead of keys
+    mouseclick                      = 0;                                    % use mouseclick instead of keys
     view_dist                       = .35;                                  % m .57; psychophysics room: .35 .50
     screensize                      = [.405 .298];                          % m psychophysics room: [.405 .298], home: [.495 .312] [.697 .392]
     pixels                          = [1600 1200];                          % psychophysics room: [1600 1200], home: [1920 1200]
-    frame_rate                      = 30;                                   % Hz 85 , 60 at hhome
+    frame_rate                      = 144; %30;                                   % Hz 85 , 60 at hhome
 
     view_window                     = round([rad2deg(atan(screensize(1)/2/view_dist)) rad2deg(atan(screensize(2)/2/view_dist))]);  % X,Y centered around fixation [60 46] [54 40];                                                                      % [36 27] for laptop, [55 32] for monitor
     scale_factor                    = sqrt((view_window(1)*60*view_window(2)*60)/(pixels(1)*pixels(2)))*1;          % Arcmin/pixel 1.78 2.25 1.92dell: 1680x1050, psychophysics room: 1600x1200                                % Screen frame rate (hz) psychophysics room: 85
@@ -34,7 +34,7 @@ addpath('/Users/hopelutwak/Documents/MATLAB/VisTools/')
 %                                                                         % deg/s *up is down and down is up
     weberFrac                       = .5;                                    % magnitude deviation vector deg/s
     scramble                        = 0;                                    % scramble surround with optic flow info, 0 is same velociy in surround
-    depth_structure                 = 2;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene , 3 = defined 3D scene
+    depth_structure                 = 3;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene , 3 = defined 3D scene
     ds                              = [];
     
     stim_type                       = 1;                                    % 0 = 1/f noise, 1 = gratings
@@ -44,7 +44,7 @@ addpath('/Users/hopelutwak/Documents/MATLAB/VisTools/')
 %      theta                           = [0 90];
     fixateMovement                  = 0;                                    % 1 = red fixation dot moves, 0 = stationary red fixation dot
     eyeTracking                     = 0;                                    % 1 = eye tracking on, 0 = eye tracking off
-    stimulus_duration               = .5;                                   % seconds
+    stimulus_duration               = 1;                                   % seconds
     test                            = 1;                                    % just shows one stim
     if test
         stimulus_duration = 1;
