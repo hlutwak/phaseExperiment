@@ -14,7 +14,7 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
     feedback                        = 1;                                    % 1 = gives feedback after each trial (training), 0 = no feedback (actual experiment)
 
     %-----Rig Settings----------------------
-    mouseclick                      = 1;                                    % use mouseclick instead of keys
+    mouseclick                      = 0;                                    % use mouseclick instead of keys
     view_dist                       = .35;                                  % m .57; psychophysics room: .35 .50
     screensize                      = [.405 .298];                          % m psychophysics room: [.405 .298], home: [.495 .312] [.697 .392]
     pixels                          = [1600 1200];                          % psychophysics room: [1600 1200], home: [1920 1200]
@@ -33,8 +33,8 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
     translation                     = [0,.05, 1.4];             
 %                                       [ 0, -0.15, .65]];                 % deg/s *up is down and down is up
     weberFrac                       = .5;
-    scramble                        = 0;                                  % scramble surround with optic flow info, 0 is same velociy in surround
-    depth_structure                 = 3;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene 
+    scramble                        = 1;                                  % scramble surround with optic flow info, 0 is same velociy in surround
+    depth_structure                 = 2;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene 
     ds                              = [];
     
     stim_type                       = 1;                                     % 0 = 1/f noise, 1 = gratings
@@ -47,7 +47,7 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
     stimulus_duration               = .5;                                   % seconds
     test                            = 1;                                    % just shows a few stimv
     if test
-        stimulus_duration = 1;
+        stimulus_duration = 5;
 %         n_trials                        = 4;
 %         n_anchors                       = 2;
 %         theta                           = [0 90];
@@ -554,7 +554,6 @@ for b = 1:n_blocks
                     dev0 = find(dots_deg(1,:) == devleft(1) & dots_deg(2,:) == devleft(2));
                 case 3
                     [dots_m, dots_deg, dev0, dev1] = make_surround_withflow(dot_density, jitter, cloud_dist, view_window, devPos, extent, depth_structure, ds);
-                    dots_deg = [dots_deg mirrorcluster cluster];
                     nearestidx = knnsearch([X(:,1) Y(:,1)],dots_deg');
                     distances = vecnorm(dots_deg- [X(nearestidx,1)'; Y(nearestidx,1)']);
                     nothingidx = find(distances>.1);

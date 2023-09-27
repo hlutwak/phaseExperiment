@@ -9,8 +9,8 @@ addpath('/Users/hopelutwak/Documents/MATLAB/psignifit')
 
 % assign data folder
 % dataFolder = '/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/OpticFlow/phaseExperiment/data';
-dataFolder = '/Users/hopelutwak/Documents/GitHub/phaseExperiment/data';
-% dataFolder = 'C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment\data';
+% dataFolder = '/Users/hopelutwak/Documents/GitHub/phaseExperiment/data';
+dataFolder = 'C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment\data';
 
 % names of files
 S = dir(fullfile(dataFolder,'*.mat'));
@@ -19,6 +19,15 @@ S = dir(fullfile(dataFolder,'*.mat'));
 subject = ["ABC"]; %"ABC", "HL","MR", "KB", "KZ"
 stim = "_natural"; % '_GP_T1' '_GP_T2' 'C_natural'  **(T1 = [0 .05 1.4], T2 = [0 .5 1.4])**
 
+% mean surround for natural scene
+surr =   [ -0.0126; 0.1094];
+% mean surround t2 
+surr = [-0.0275; -0.2447];
+% mean surround t1
+surr =  [ -0.0331; 0.3989];
+
+%velocity range for t2, .05 depth range
+velocity_range = [    0.5048    0.5013; -0.2624   -0.2540];
 
 %load appropriate files
 count = 1;
@@ -131,6 +140,8 @@ end
 nCorrect = zeros(n_conditions,size(cond(1).steps,2));
 nTrials = zeros(n_conditions,size(cond(1).steps,2));
 distConst = zeros(n_conditions,size(cond(1).steps,2));
+distSurr = zeros(n_conditions,size(cond(1).steps,2));
+
 
 %save in correct angle order
 
@@ -145,7 +156,9 @@ for ii = 1:n_conditions
             numTrials = length(idx);
             ncorrect = sum(data(jj).resp_history(idx));
             
-            distConst(ii,step) = point2segment(data(jj).steps(:,step),data(jj).velocity_range(:,1),data(jj).velocity_range(:,2));
+%             distConst(ii,step) = point2segment(data(jj).steps(:,step),data(jj).velocity_range(:,1),data(jj).velocity_range(:,2));
+            distConst(ii,step) = point2segment(data(jj).steps(:,step),velocity_range(:,1),velocity_range(:,2));
+            distSurr(ii,step) = vecnorm(data(jj).steps(:,step) - surr); % must have run control first
             nCorrect(ii,step) = nCorrect(ii,step)+ncorrect;
             nTrials(ii,step) = nTrials(ii,step)+numTrials;
         end
@@ -192,6 +205,16 @@ data_const(data_const(:,end)==0, :) = [];
 result_const = psignifit(data_const, options);
 figure
 plotPsych(result_const);
+title('dist to constraint')
+
+
+% distSurr(:,end) = ones(size(distSurr(:,end)))*1e-5;
+data_surr = [distSurr(:), nCorrect(:), nTrials(:)];
+data_surr(data_surr(:,end)==0, :) = [];
+result_surr = psignifit(data_surr, options);
+figure
+plotPsych(result_surr);
+title('dist to surround')
 
 
 % plot thresholds in velocity space
@@ -307,11 +330,6 @@ dtheta = real(acosd(unit_base'*unit_thresh));
 % figure
 % hold on
 % polarplot(deg2rad(sorted_unique_deltaAngles), weber_speed, 'color', colors(1,:), 'LineWidth', 2)
-
-%% fit psychometric curve based on distance to constraint
-% need to actually get all velocities tested
-% in data.steps
-point2segment(velocity_tested, data(cond_idx(2)).velocity_range(:,1,1),data(cond_idx(2)).velocity_range(:,2,1))
 
 %% archive
 % % plot magnitude distance from base velocity
