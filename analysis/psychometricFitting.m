@@ -3,20 +3,21 @@
 % calculate thresholds and confidence intervals for velocities tested
 % clear;
 % add psignifit toolbox
-% addpath('/Users/hopelutwak/Documents/MATLAB/psignifit')
-addpath(genpath('C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment'))
+addpath('/Users/hopelutwak/Documents/MATLAB/psignifit')
+% addpath(genpath('C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment'))
 % addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/OpticFlow/phaseExperiment/data')
 
 % assign data folder
 % dataFolder = '/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/OpticFlow/phaseExperiment/data';
-dataFolder = 'C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment\data';
+dataFolder = '/Users/hopelutwak/Documents/GitHub/phaseExperiment/data';
+% dataFolder = 'C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment\data';
 
 % names of files
 S = dir(fullfile(dataFolder,'*.mat'));
 
 % which subject data to analyze
-subject = ["HL"]; %"ABC", "HL","MR", "KB", "KZ"
-stim = "_GP_T2"; % '_GP_T1' '_GP_T2' 'C_natural'  **(T1 = [0 .05 1.4], T2 = [0 .5 1.4])**
+subject = ["ABC"]; %"ABC", "HL","MR", "KB", "KZ"
+stim = "_natural"; % '_GP_T1' '_GP_T2' 'C_natural'  **(T1 = [0 .05 1.4], T2 = [0 .5 1.4])**
 
 
 %load appropriate files
@@ -129,6 +130,7 @@ end
 % get n correct for each stim
 nCorrect = zeros(n_conditions,size(cond(1).steps,2));
 nTrials = zeros(n_conditions,size(cond(1).steps,2));
+distConst = zeros(n_conditions,size(cond(1).steps,2));
 
 %save in correct angle order
 
@@ -142,7 +144,8 @@ for ii = 1:n_conditions
             idx = find(data(jj).step_history ==step);
             numTrials = length(idx);
             ncorrect = sum(data(jj).resp_history(idx));
-
+            
+            distConst(ii,step) = point2segment(data(jj).steps(:,step),data(jj).velocity_range(:,1),data(jj).velocity_range(:,2));
             nCorrect(ii,step) = nCorrect(ii,step)+ncorrect;
             nTrials(ii,step) = nTrials(ii,step)+numTrials;
         end
@@ -182,6 +185,14 @@ for ii = 1:n_conditions
 end
 
 %
+% fit results to distance to constraint
+distConst(:,end) = ones(size(distConst(:,end)))*1e-5;
+data_const = [distConst(:), nCorrect(:), nTrials(:)];
+data_const(data_const(:,end)==0, :) = [];
+result_const = psignifit(data_const, options);
+figure
+plotPsych(result_const);
+
 
 % plot thresholds in velocity space
 
