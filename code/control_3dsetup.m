@@ -18,7 +18,7 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
     view_dist                       = .35;                                  % m .57; psychophysics room: .35 .50
     screensize                      = [.405 .298];                          % m psychophysics room: [.405 .298], home: [.495 .312] [.697 .392]
     pixels                          = [1600 1200];                          % psychophysics room: [1600 1200], home: [1920 1200]
-    frame_rate                      = 30;                                     % Hz 85 , 60 at hhome
+    frame_rate                      = 85;                                     % Hz 85 , 60 at hhome
 
     view_window                     = round([rad2deg(atan(screensize(1)/2/view_dist)) rad2deg(atan(screensize(2)/2/view_dist))]);  % X,Y centered around fixation [60 46] [54 40];                                                                      % [36 27] for laptop, [55 32] for monitor
     scale_factor                    = sqrt((view_window(1)*60*view_window(2)*60)/(pixels(1)*pixels(2)))*1;          % Arcmin/pixel 1.78 2.25 1.92dell: 1680x1050, psychophysics room: 1600x1200                                % Screen frame rate (hz) psychophysics room: 85
@@ -30,7 +30,7 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
     subjectNumber                   = '01';                                 % Number used to save eyelink file
     n_trials                        = 20+.2*20;                             % Number of trials n+.2*n so +10% hard and +10% easy trials 20+.2*20;
     n_anchors                       = n_trials/1.2*.2;                      % n_trials/1.2*.2
-    translation                     = [0,.05, 1.4];             
+    translation                     = [0, .05, 1.4];             
 %                                       [ 0, -0.15, .65]];                 % deg/s *up is down and down is up
     weberFrac                       = .5;
     scramble                        = 1;                                  % scramble surround with optic flow info, 0 is same velociy in surround
@@ -348,11 +348,12 @@ addpath('/Volumes/GoogleDrive/My Drive/opticflow/objectDetection/RangeDatabase10
                 surround_window = range_distance(devPosPix(2)-surround_extent(2):min(pixels(2),devPosPix(2)+surround_extent(2)), devPosPix(1)-surround_extent(1):devPosPix(1)+surround_extent(1));
             
                 surround_distance = [min(min(surround_window)), max(max(surround_window))];
-                depth_limits = [max(.5, surround_distance(1)), surround_distance(2)]; % take average of depths in window ~2 deg around (based on dot density .5)
+%                 depth_limits = [max(.5, surround_distance(1)), surround_distance(2)]; % take average of depths in window ~2 deg around (based on dot density .5)
+                depth_limits = [middle_dist-.1, middle_dist+.1];
             case 3
                 coordinate = dsearchn([X(:,1) Y(:,1)],[devPos'; cluster']);
                 middle_dist = depths(coordinate,1); % assign depth based on defined world
-                depth_limits =  [middle_dist-2, middle_dist+2]; 
+                depth_limits =  [middle_dist-.1, middle_dist+.1]; 
         end
         
         end_vel = calculate_cloud_flow(middle_dist, [devPos cluster], cond(c).translate, view_dist, z0);
@@ -552,6 +553,9 @@ for b = 1:n_blocks
 
                     dev1 = find(dots_deg(1,:) == devright(1) & dots_deg(2,:) == devright(2)); % reassign index values for dev0 and dev1  bc got messed up from getting rid of patches that don't align with range image and screen dimensions
                     dev0 = find(dots_deg(1,:) == devleft(1) & dots_deg(2,:) == devleft(2));
+                    
+                    depth_limits = [dots_m(3,dev1)-.1, dots_m(3,dev1)+.1];
+
                 case 3
                     [dots_m, dots_deg, dev0, dev1] = make_surround_withflow(dot_density, jitter, cloud_dist, view_window, devPos, extent, depth_structure, ds);
                     nearestidx = knnsearch([X(:,1) Y(:,1)],dots_deg');

@@ -34,7 +34,7 @@ clc;
 %                                                                         % deg/s *up is down and down is up
     weberFrac                       = .5;                                    % magnitude deviation vector deg/s
     scramble                        = 0;                                    % scramble surround with optic flow info, 0 is same velociy in surround
-    depth_structure                 = 2;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene , 3 = defined 3D scene
+    depth_structure                 = 3;                                    % 0 = random cloud, 1 = ground plane, 2 = natural scene , 3 = defined 3D scene
     ds                              = [];
     
     stim_type                       = 1;                                    % 0 = 1/f noise, 1 = gratings

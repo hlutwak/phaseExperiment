@@ -16,18 +16,28 @@ dataFolder = 'C:\Users\hlutw\OneDrive\Documents\GitHub\phaseExperiment\data';
 S = dir(fullfile(dataFolder,'*.mat'));
 
 % which subject data to analyze
-subject = ["ABC"]; %"ABC", "HL","MR", "KB", "KZ"
-stim = "_natural"; % '_GP_T1' '_GP_T2' 'C_natural'  **(T1 = [0 .05 1.4], T2 = [0 .5 1.4])**
+subject = ["HL"]; %"ABC", "HL","MR", "KB", "KZ"
+stim = "_GP_T2"; % '_GP_T1' '_GP_T2' 'C_natural'  **(T1 = [0 .05 1.4], T2 = [0 .5 1.4])**
 
-% mean surround for natural scene
-surr =   [ -0.0126; 0.1094];
-% mean surround t2 
-surr = [-0.0275; -0.2447];
-% mean surround t1
-surr =  [ -0.0331; 0.3989];
+% % mean surround for natural scene
+% surr =   [0.3840;    0.1116]; % mean surround natural
+surr = [0.5075;   -0.2481]; % mean surround t2 
+%  surr =  [  0.4837;   0.3980]; % mean surround t1
 
-%velocity range for t2, .05 depth range
-velocity_range = [    0.5048    0.5013; -0.2624   -0.2540];
+
+% % get the surround from experiment
+% % run control
+% % get rhs velocities, get rid of center
+% rhs = find(dots_deg(1,:)>0);
+% rhs(rhs == dev1) = [];
+% surr = mean(velocity_field(:,rhs)');
+
+
+% velocity_range = [0.2499    0.2481; 0.0771    0.0767]; % velocity range natural, .1 depth range, original  20.0025   45.7370m
+
+velocity_range = [0.5065    0.4996; -0.2666   -0.2499]; % velocity range for t2, .1 depth range
+
+% velocity_range = [0.4877    0.4810 ; 0.4034    0.3953];  % velocity range for t1, .1 depth range
 
 %load appropriate files
 count = 1;
@@ -156,8 +166,9 @@ for ii = 1:n_conditions
             numTrials = length(idx);
             ncorrect = sum(data(jj).resp_history(idx));
             
-%             distConst(ii,step) = point2segment(data(jj).steps(:,step),data(jj).velocity_range(:,1),data(jj).velocity_range(:,2));
-            distConst(ii,step) = point2segment(data(jj).steps(:,step),velocity_range(:,1),velocity_range(:,2));
+            distConst(ii,step) = point2segment(data(jj).steps(:,step),data(jj).velocity_range(:,1),data(jj).velocity_range(:,2)); % +/- 2m
+%             distConst(ii,step) = point2segment(data(jj).steps(:,step),velocity_range(:,1),velocity_range(:,2)); % different depth range
+%              distConst(ii,step) = vecnorm(data(jj).steps(:,step)- data(jj).steps(:,end)); % distance to base
             distSurr(ii,step) = vecnorm(data(jj).steps(:,step) - surr); % must have run control first
             nCorrect(ii,step) = nCorrect(ii,step)+ncorrect;
             nTrials(ii,step) = nTrials(ii,step)+numTrials;
@@ -175,7 +186,7 @@ options.expType     = '2AFC';   % choose 2-AFC as the paradigm of the experiment
                                 % fits the rest of the parameters
 options.fixedPars = NaN(5,1);                                
 options.fixedPars(5) = 0;       % fix eta (dispersion) to zero
-
+options.poolxTol = 0.01;
 figure
 %loop through stim conditions and get threshold and plot curves
 
@@ -260,9 +271,11 @@ hold on, plot([velocity_thresh(1,:) velocity_thresh(1,1)],-[velocity_thresh(2,:)
 % plot base velocity
 hold on, quiver(0, 0, data(cond_idx(2)).steps(1,end,1), -data(cond_idx(2)).steps(2,end,1), 'Color', 'k','LineWidth', 2,'AutoScaleFactor',1)
 % % plot constraint line
-if ~control
+% if ~control
     hold on, plot(data(cond_idx(2)).velocity_range(1,:,1), -data(cond_idx(2)).velocity_range(2,:,1), 'color', [.5 .5 .5], 'linewidth', 2)
-end
+% end
+    hold on, plot(velocity_range(1,:), -velocity_range(2,:), 'color', [.75 .75 .75], 'linewidth', 2)
+
 
 axis equal
 
